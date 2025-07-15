@@ -71,6 +71,7 @@ class PushAPIServer:
                 logger.warning(f"来自 {request.remote_addr} 的令牌无效")
                 abort(403, description="无效令牌")
 
+            print(request.get_data(as_text=True))
             params = parse_qs(request.get_data(as_text=True))
             data = {k: v[0] for k, v in params.items()}
             if not data:
