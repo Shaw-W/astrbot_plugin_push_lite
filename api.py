@@ -72,7 +72,6 @@ class PushAPIServer:
                 abort(403, description="无效令牌")
 
             params_raw = await request.get_data(as_text=True)
-            logger.info(params_raw)
             params = parse_qs(params_raw)
             data = {k: v[0] for k, v in params.items()}
             if not data:
