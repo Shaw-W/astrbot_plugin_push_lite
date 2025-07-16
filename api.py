@@ -64,18 +64,18 @@ class PushAPIServer:
                 }
             )
 
-        @self.app.route("/send_raw", methods=["POST"])
-        async def send_raw_endpoint():
+        @self.app.route("/send_form", methods=["POST"])
+        async def send_form_endpoint():
             auth_header = request.headers.get("Authorization")
             if not auth_header or auth_header != f"Bearer {self.token}":
                 logger.warning(f"来自 {request.remote_addr} 的令牌无效")
                 abort(403, description="无效令牌")
 
-            params_raw = await request.get_data(as_text=True)
-            params = parse_qs(params_raw)
+            params_form = await request.get_data(as_text=True)
+            params = parse_qs(params_form)
             data = {k: v[0] for k, v in params.items()}
             if not data:
-                abort(400, description="无效的 JSON")
+                abort(400, description="无效的 Form Data")
 
             required_fields = {"content", "umo"}
             if missing := required_fields - data.keys():
