@@ -10,38 +10,24 @@ Astrbot轻量级推送插件，提供api服务。目前仅支持发送文本消�
 > [!note]
 > 目标会话标识可用/sid查看。/sid 指令返回的结果中的 SID 就是 umo 。
 
-参数message_type可选配置如下
-
-```
-text: 纯文本
-image: 纯图片
-text_image: 前面文本后面追加图片
-image_text: 前面图片后面追加文本
-```
-
 ### **1. 发送消息(json)**  
-
 **Endpoint:**  
 `POST /send`  
 
 **Headers:**  
-
 - `Authorization: Bearer <API_TOKEN>`  
 
 **Request Body (JSON):**  
-
 ```json
 {
   "content": "消息内容或base64编码的图片",
   "umo": "目标会话标识",
-  "message_type": "可选，消息类型，默认为text",
-  "callback_url": "可选，处理结果回调URL",
-  "images":"xxx,xxxx", // 图片链接列表，使用,分割
+  "type": "可选，消息类型，默认为text，可选值：text, image",
+  "callback_url": "可选，处理结果回调URL"
 }
 ```
 
 **Response:**  
-
 ```json
 {
   "status": "queued",
@@ -53,22 +39,18 @@ image_text: 前面图片后面追加文本
 ---
 
 ### **2. 发送消息(form_data)**  
-
 **Endpoint:**  
 `POST /send_form`  
 
 **Headers:**  
-
 - `Authorization: Bearer <API_TOKEN>`  
 
 **Request Body (Form):**  
-
 ```text
-content=消息内容或base64编码的图片&umo=目标会话标识&message_type=可选，消息类型，默认为text&callback_url=可选，处理结果回调URL&images=xxx,xxxxx
+content=消息内容或base64编码的图片&umo=目标会话标识&type=可选，消息类型，默认为text，可选值：text, image&callback_url=可选，处理结果回调URL
 ```
 
 **Response:**  
-
 ```json
 {
   "status": "queued",
@@ -80,12 +62,10 @@ content=消息内容或base64编码的图片&umo=目标会话标识&message_type
 ---
 
 ### **3. 健康检查**  
-
 **Endpoint:**  
 `GET /health`  
 
 **Response:**  
-
 ```json
 {
   "status": "ok",
@@ -96,11 +76,9 @@ content=消息内容或base64编码的图片&umo=目标会话标识&message_type
 ---
 
 ### **3. 回调通知格式（如果提供 `callback_url`）**  
-
 **Method:** `POST`  
 
 **Request Body (JSON):**  
-
 ```json
 {
   "message_id": "原始消息ID",
@@ -110,7 +88,6 @@ content=消息内容或base64编码的图片&umo=目标会话标识&message_type
 ```
 
 **成功示例:**  
-
 ```json
 {
   "message_id": "123e4567-e89b-12d3-a456-426614174000",
@@ -119,7 +96,6 @@ content=消息内容或base64编码的图片&umo=目标会话标识&message_type
 ```
 
 **失败示例:**  
-
 ```json
 {
   "message_id": "123e4567-e89b-12d3-a456-426614174000",
@@ -131,6 +107,5 @@ content=消息内容或base64编码的图片&umo=目标会话标识&message_type
 ---
 
 ### **错误码**  
-
 - **400**: 请求格式错误或缺少必要字段
 - **403**: API 令牌无效

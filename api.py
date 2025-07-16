@@ -1,4 +1,3 @@
-import aiohttp
 import asyncio
 import uuid
 
@@ -46,26 +45,12 @@ class PushAPIServer:
             if missing := required_fields - data.keys():
                 abort(400, description=f"缺少字段: {missing}")
 
-            images = []
-            if "images" in data:
-                images = data["images"].split(",")
-                
-            image_bytes = []
-            for image_url in images:
-                if not image_url.startswith("http"):
-                    logger.error(f"无效的图片 URL: {image_url}")
-                image_byte = await self._get_image_bytes(image_url)
-                if not image_byte:
-                    logger.error(f"获取图片失败: {image_url}")
-                image_bytes.append(image_byte)
-
             message = {
                 "message_id": data.get("message_id", str(uuid.uuid4())),
                 "content": data["content"],
                 "umo": data["umo"],
                 "type": data.get("message_type", "text"),
                 "callback_url": data.get("callback_url"),
-                "image_bytes": image_bytes,
             }
 
             self.in_queue.put(message)
@@ -95,19 +80,6 @@ class PushAPIServer:
             required_fields = {"content", "umo"}
             if missing := required_fields - data.keys():
                 abort(400, description=f"缺少字段: {missing}")
-                
-            images = []
-            if "images" in data:
-                images = data["images"].split(",")
-                
-            image_bytes = []
-            for image_url in images:
-                if not image_url.startswith("http"):
-                    logger.error(f"无效的图片 URL: {image_url}")
-                image_byte = await self._get_image_bytes(image_url)
-                if not image_byte:
-                    logger.error(f"获取图片失败: {image_url}")
-                image_bytes.append(image_byte)
 
             message = {
                 "message_id": data.get("message_id", str(uuid.uuid4())),
@@ -115,7 +87,6 @@ class PushAPIServer:
                 "umo": data["umo"],
                 "type": data.get("message_type", "text"),
                 "callback_url": data.get("callback_url"),
-                "image_bytes": image_bytes,
             }
 
             self.in_queue.put(message)
@@ -137,18 +108,6 @@ class PushAPIServer:
                     "queue_size": self.in_queue.qsize(),
                 }
             )
-
-    async def _get_image_bytes(self, image_url: str) -> bytes:
-        """从URL获取图片字节"""
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(image_url) as resp:
-                    if resp.status != 200:
-                        raise Exception(f"无法获取图片: {resp.status}")
-                    return await resp.read()
-        except Exception as e:
-            logger.error(f"{image_url}, 获取图片失败: {str(e)}")
-            return b""
 
     async def start(self, host: str, port: int):
         """启动HTTP服务"""
