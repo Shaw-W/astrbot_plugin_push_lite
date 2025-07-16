@@ -64,6 +64,19 @@ class PushLite(Star):
                     except Exception:
                         raise Exception("不支持的图片格式")
                     chain = MessageChain(chain=[Comp.Image.fromBytes(image)])
+                elif message["type"] == "text_image":
+                    # 尾部追加图片
+                    msgs = [Comp.Plain(message["content"])]
+                    for image_byte in message['image_bytes']:
+                        msgs.append(Comp.Image.fromBytes(image_byte))
+                    chain = MessageChain(chain=msgs)
+                elif message["type"] == "image_text":
+                    # 头部追加图片
+                    msgs = []
+                    for image_byte in message['image_bytes']:
+                        msgs.append(Comp.Image.fromBytes(image_byte))
+                    msgs.append(Comp.Plain(message["content"]))
+                    chain = MessageChain(chain=msgs)
                 else:
                     logger.debug("处理文本消息")
                     chain = MessageChain(chain=[Comp.Plain(message["content"])])
